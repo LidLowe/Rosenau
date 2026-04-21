@@ -8,9 +8,9 @@ import java.math.BigInteger;
 
 public class Encrypt
 {
-    public static BigInteger[] encrypt(String p, PublicKey pk, int bitLen)
+    public static BigInteger[] encrypt(String p, PublicKey pk)
     {
-        BigInteger[] m = Padding.generatePKCS(p, bitLen);
+        BigInteger[] m = Padding.generatePKCS(p, pk.n.bitLength());
 
         BigInteger[] c = new BigInteger[m.length];
         for (int r = 0; r < m.length; r++)

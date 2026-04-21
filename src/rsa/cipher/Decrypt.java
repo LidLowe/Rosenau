@@ -14,29 +14,33 @@ public class Decrypt
         int bitLen = pk.n.bitLength();
         StringBuilder m = new StringBuilder();
 
-        for (int r = 0; r < c.length; r++)
-        {
-            byte[] block = Math.modExp(c[r], pk.d, pk.n).toByteArray();
-
-            int separator = 2;
-            for (int i = 2; i < block.length; i++)
-            {
-                if (block[i] == 0x00)
+        for (BigInteger bigInteger : c) {
+            try {
+                byte[] block = Math.modExp(bigInteger, pk.d, pk.n).toByteArray();
+                int separator = 2;
+                for (int i = 2; i < block.length; i++)
                 {
-                    separator = i;
-                    break;
+                    if (block[i] == 0x00)
+                    {
+                        separator = i;
+                        break;
+                    }
                 }
+
+                byte[] message = Arrays.copyOfRange(block, separator + 1, block.length);
+
+                int end = message.length;
+                while (end > 0 && message[end - 1] == 0x00)
+                {
+                    end--;
+                }
+
+                m.append(new String(Arrays.copyOfRange(message, 0, end), StandardCharsets.UTF_8));
             }
-
-            byte[] message = Arrays.copyOfRange(block, separator + 1, block.length - 1);
-
-            int end = message.length;
-            while (end > 0 && message[end - 1] == 0x00)
+            catch (Exception e)
             {
-                end--;
+                throw new IllegalArgumentException("Corrupted arguments");
             }
-
-            m.append(new String(Arrays.copyOfRange(message, 0, end), StandardCharsets.UTF_8));
         }
 
         return m.toString();
